@@ -31,11 +31,7 @@ SELECT TRIM(SNAME)
 --<단일 행 함수를 이용하세요>
 --1) 교수들이 부임한 달에 근무한 일수는 몇 일인지 검색하세요
 SELECT PNAME
-	 , HIREDATE 
-	 , LAST_DAY(HIREDATE) - HIREDATE
-	 FROM PROFESSOR;
-
---2) 교수들의 오늘까지 근무한 주가 몇 주인지 검색하세요
+	 , HIREDATE A
 SELECT PNAME
 	 , HIREDATE 
 	 , ROUND(SYSDATE) - ROUND(HIREDATE)
@@ -73,8 +69,13 @@ SELECT SNAME
 
 --2) 교수의 부임일을 다음 형식으로 표현하세요
 --'OOO 교수의 부임일은 YYYY년 MM월 DD일입니다.'
-SELECT 
+SELECT PNAME||TO_CHAR(HIREDATE, '"교수의 부임일은" YYYY"년" MM"월" DD"일입니다."')
+	FROM PROFESSOR;
 
 --3) 교수중에 3월에 부임한 교수의 명단을 검색하세요
-
-  
+SELECT PNO
+	 , PNAME
+	 , HIREDATE
+	FROM PROFESSOR
+	WHERE TO_CHAR(HIREDATE, 'MM') = '03';
+  	

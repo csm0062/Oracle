@@ -207,3 +207,29 @@ SELECT ENO
 	 , HDATE + 100
 	 , ADD_MONTHS(HDATE, 120)
 	FROM EMP;
+	
+-- 1-7. 변환함수
+-- TO_CHAR(날짜나 숫자, 변환될 문자열의 형식지정자): 매개변수로 받은 날짜나 숫자 데이터를 지정된 형식으로 변환한 문자열을 리턴
+-- 숫자를 문자열로 변환
+SELECT TO_CHAR(10000000, '999,999,999') -- 9자리까지 숫자를 표기하고 3자리마다 쉼표 표시
+	 , TO_CHAR(1000000, '099,999,999') -- 9자리까지 숫자를 표기하고 3자리마다 쉼표 표시, 0을 붙여서 표기
+	FROM DUAL;
+
+-- 날짜를 문자열로 변환
+SELECT TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS')
+	 , TO_CHAR(SYSDATE, 'YYYY/MM/DD DAY')
+	 , TO_CHAR(SYSDATE, '"오늘은 "YYYY"년 " MM"월 " DD"일입니다."')
+	 , TO_CHAR(SYSDATE, 'DY"요일입니다."')
+	FROM DUAL;
+
+SELECT TO_DATE('2024/05/24 15:18:00', 'YYYY/MM/DD HH24:MI:SS')
+	FROM DUAL;
+
+-- 교수의 부임일을 다음 형식으로 표현하세요
+-- 'OOO 교수의 부임일은 YYYY년 MM월 DD일입니다.'
+
+
+-- 교수중에 3월에 부임한 교수의 명단을 검색하세요
+
+
+

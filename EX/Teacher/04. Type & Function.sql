@@ -227,9 +227,163 @@ SELECT TO_DATE('2024/05/24 15:18:00', 'YYYY/MM/DD HH24:MI:SS')
 
 -- 교수의 부임일을 다음 형식으로 표현하세요
 -- 'OOO 교수의 부임일은 YYYY년 MM월 DD일입니다.'
-
+SELECT PNAME || ' 교수의 부임일은 ' || TO_CHAR(HIREDATE, 'YYYY"년 "MM"월 "DD"일입니다."')
+	FROM PROFESSOR;
 
 -- 교수중에 3월에 부임한 교수의 명단을 검색하세요
+SELECT PNO
+	 , PNAME
+	 , HIREDATE
+	FROM PROFESSOR
+	WHERE TO_CHAR(HIREDATE, 'MM') = '03';
+
+-- TO_DATE(문자열 데이터, 문자열 데이터의 날짜 형식): 매개변수로 지정된 날짜형식으로 되어있는 문자열을 DATE 타입으로 변환 후 리턴
+SELECT TO_DATE('20240524154900', 'YYYYMMDDHH24MISS')
+	 , TO_DATE('240524 15', 'YYMMDD HH24')
+	 , TO_DATE('24', 'YY')
+	 , TO_DATE('24', 'RR')
+	 , TO_DATE('99', 'YY')
+	 , TO_DATE('99', 'RR')
+	 , TO_DATE('2024/05', 'YYYY/MM')
+	FROM DUAL;
+
+-- TO_NUMBER(문자열 데이터, 문자열 데이터의 숫자 형식): 매개변수로 지정된 숫자 형식으로 된 문자열을 NUMBER 타입으로 변환 후 리턴
+SELECT TO_NUMBER('-123.456', '999.999')
+	 , TO_NUMBER('123', '999.99')
+	 , TO_NUMBER('1234')
+	FROM DUAL;
+
+-- ROUND(실수, 소수점), TRUNC(실수, 소수점)
+-- ROUND(실수), TRUNC(실수): 정수까지(소수점 첫 째자리에서) 반올림, 정수까지(소수점 첫 째자리에서) 버림
+SELECT ROUND(1.45, 0)
+	 , ROUND(1.45)
+	FROM DUAL;
+
+-- 1-8. NVL: NULL 처리 함수
+-- 과목의 과목번호, 과목이름, 교수번호, 교수이름을 조회하는데 담당교수가 배정되지 않은 과목과 과목을 배정받지 못한 교수의 정보도 함께 조회
+-- 담당교수가 NULL인 과목의 교수정보는 교수 배정되지 않음이라고 조회하고
+-- 과목이 NULL인 교수의 과목정보는 과목 배정받지 못함이라고 조회
+SELECT NVL(C.CNO, '과목 배정받지 못함')
+	 , NVL(C.CNAME, '과목 배정받지 못함')
+	 , NVL(P.PNO, '교수 배정되지 않음')
+	 , NVL(P.PNAME, '교수 배정되지 않음')
+	FROM COURSE C
+	FULL OUTER JOIN PROFESSOR P
+	  ON C.PNO = P.PNO;
+
+-- 1-9. DECODE(컬럼명이나 조회해온 데이터, 조건 값1, 
+--			   컬럼의 데이터나 조회해온 데이터가 조건 값1과 일치할 때 실행될 내용, 
+--			   컬럼의 데이터나 조회해온 데이터가 조건 값1과 일치하지 않을 실행될 내용)
+-- DECODE는 조건문을 처리하는 구문으로 조건에는 값만 넣어서 사용할 수 있다.
+SELECT ENO
+	 , ENAME
+	 , DNO
+	 , DECODE(DNO, '10', '인사팀', '다른 부서') AS "부서명"
+	FROM EMP
+	ORDER BY DNO;
+
+-- DECODE(컬럼명이나 조회해온 데이터, 조건 값1, 
+--		  컬럼의 데이터나 조회해온 데이터가 조건 값1과 일치할 때 실행될 내용, 
+--		  조건 값2,
+--		  컬럼의 데이터나 조회해온 데이터가 조건 값2과 일치할 때 실행될 내용, 
+--		  조건 값3,
+--		  컬럼의 데이터나 조회해온 데이터가 조건 값3과 일치할 때 실행될 내용, 
+--        ...
+--        조건 값N,
+--		  컬럼의 데이터나 조회해온 데이터가 조건 값N과 일치할 때 실행될 내용, 
+--        컬럼의 데이터나 조회해온 데이터가 조건 값N과 일치하지 않을 때 실행될 내용(위의 조건과 모두 일치하지 않는 경우))
+SELECT ENO
+	 , ENAME
+	 , DNO
+	 , DECODE(DNO, 
+	 			'10', '인사팀', 
+	 			'01', '경영팀',
+	 			'02', '개발팀',
+	 			'그 외 부서') AS "부서명"
+	FROM EMP
+	ORDER BY DNO;
+
+-- 사원의 사원번호, 사원이름, 업무, 급여, 인상급여 조회
+-- 업무가 개발이면 50%인상, 업무가 경영이면 30%인상, 지원이면 20%인상, 그 외 업무면 10%이상 된 인상급여 조회
+SELECT ENO
+	 , ENAME
+	 , JOB
+	 , SAL
+	 , DECODE(JOB,
+	 			'개발', SAL * 1.5,
+	 			'경영', SAL * 1.3,
+	 			'지원', SAL * 1.2,
+	 			SAL * 1.1) AS CHANGED_SAL
+	FROM EMP;
+
+-- 1-10. CASE~WHEN~THEN~ELSE END
+-- CASE (컬럼명)
+-- 	  WHEN 조건1
+--	  THEN 조건1이 TRUE일 때 처리할 내용
+-- 	  WHEN 조건2
+--	  THEN 조건2이 TRUE일 때 처리할 내용
+--    ...
+-- 	  WHEN 조건N
+--	  THEN 조건N이 TRUE일 때 처리할 내용
+--	  ELSE
+-- 	  위 조건이 모두 FALSE인 데이터에 대한 처리내용
+-- 	  END AS 별칭
+-- CASE 절에 컬럼이나 데이터를 지정한 경우(SWITCH CASE 문 처럼 사용)
+SELECT ENO
+	 , ENAME
+	 , COMM
+	 , CASE NVL(COMM, -1)
+	 	 WHEN 0 
+	 	 THEN '보너스 없음'
+	 	 WHEN -1
+	 	 THEN '해당없음'
+	   ELSE '보너스: ' || COMM
+	   END AS COMM_TXT
+	 FROM EMP;
+
+-- CASE 절에 컬럼이나 데이터를 지정하지 않은 경우(WHEN 절에 비교문을 사용하여 조건을 지정할 수 있다.)
+SELECT ENO
+	 , ENAME
+	 , COMM
+	 , CASE
+	 	 WHEN COMM = 0
+	 	 THEN '보너스 없음'
+	 	 WHEN COMM IS NULL
+	 	 THEN '해당없음'
+	   ELSE '보너스: ' || COMM
+	   END AS COMM_TXT
+	 FROM EMP;
+
+	
+-- 사원의 사원번호, 사원이름, 업무, 급여, 인상급여 조회
+-- 업무가 개발이면 50%인상, 업무가 경영이면 30%인상, 지원이면 20%인상, 그 외 업무면 10%이상 된 인상급여 조회
+SELECT ENO
+     , ENAME
+ 	 , JOB
+ 	 , SAL
+ 	 , CASE JOB
+	 	 WHEN '개발'
+	 	 THEN SAL * 1.5
+	 	 WHEN '경영'
+	 	 THEN SAL * 1.3
+	 	 WHEN '지원'
+	 	 THEN SAL * 1.2
+	   ELSE SAL * 1.1
+	   END AS CHANGED_SAL
+FROM EMP;
 
 
-
+SELECT ENO
+     , ENAME
+ 	 , JOB
+ 	 , SAL
+ 	 , CASE 
+	 	 WHEN JOB = '개발'
+	 	 THEN SAL * 1.5
+	 	 WHEN JOB = '경영'
+	 	 THEN SAL * 1.3
+	 	 WHEN JOB = '지원'
+	 	 THEN SAL * 1.2
+	   ELSE SAL * 1.1
+	   END AS CHANGED_SAL
+FROM EMP;
